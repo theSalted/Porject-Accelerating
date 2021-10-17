@@ -68,27 +68,20 @@ let player;
  */
  let stars;
  
- // init meteorite
- /**
-  * @typedef {{
-  * pos: Vector
-  * }} Obstacle
-  */
- 
- /**
-  * @type { Obstacle [] }
-  */
+//  Init meteorite
+/**
+ * @typedef {{
+ * pos: Vector,
+ * speed: number
+ * }} Meteorite
+ */
+
+/**
+ * @type { Meteorite [] }
+ */
  let meteorite;
  
- /**
-  * @type { number }
-  */
- let currentMeteSpeed;
  
- /**
-  * @type { number }
-  */
- let waveCount;
 
 // The game loop function
 function update() {
@@ -99,22 +92,37 @@ function update() {
         // Second argument (function): a function that returns an object. This
         // object is then added to an array. This array will eventually be
         // returned as output of the times() function.
+        
+    // ---- STARS ----
 		stars = times(200, () => {
             // Random number generator function
             // rnd( min, max )
             const posX = rnd(0, G.WIDTH);
             const posY = rnd(0, G.HEIGHT);
             // An object of type Star with appropriate properties
-            return {
-                // Creates a Vector
-                pos: vec(posX, posY),
-                // More RNG
-                speed: rnd(G.STAR_SPEED_MIN, G.STAR_SPEED_MAX)
-            };
-        });
-        player = {
+              return {
+                  // Creates a Vector
+                  pos: vec(posX, posY),
+                  // More RNG
+                  speed: rnd(G.STAR_SPEED_MIN, G.STAR_SPEED_MAX)
+              };
+    });
+    
+    // ---- PLAYER ----
+    player = {
       pos: vec(G.WIDTH * 0.5, G.HEIGHT * 0.8)
     };
+    
+    // ---- Meteorite ----
+    meteorite = times(5, () => {
+      // define meteorite position
+      const posX = rnd(G.WIDTH * 0.1, G.WIDTH * 0.9)
+      const posY = rnd(0, G.HEIGHT)
+        return {
+          pos: vec(posX, posY)
+        }
+    });
+    
     
     // init stars variable
     // star speed = random speed * factor
@@ -123,34 +131,42 @@ function update() {
     //variable init for player
     player.speed = G.DEFAULTPSPEED;
     player.isMovingRight = true;
-	}
-
-    // Update for Star
-    stars.forEach((s) => {
-        // Move the star downwards
-        s.pos.y += s.speed;
-        // Bring the star back to top once it's past the bottom of the screen
-        if (s.pos.y > G.HEIGHT) s.pos.y = 0;
-
-        // Choose a color to draw
-        color("light_black");
-        // Draw the star as a square of size 1
-        box(s.pos, 2);
-    });
-      // Update for Star
-  stars.forEach((s) => {
-        // Move the star downwards
-        s.pos.y += s.speed * stars.speedFactor;
-        // Bring the star back to top once it's past the bottom of the screen
-        if (s.pos.y > G.HEIGHT) s.pos.y = 0;
-
-        // Choose a color to draw
-        color("light_black");
-        // Draw the star as a square of size 1
-        box(s.pos, 1);
-    });
     
-  // player activation
+	}
+  
+  // ***********************************
+  // ******* UPDATE STARTS HERE ********
+  // ***********************************
+  
+  // Update for Star
+  stars.forEach((s) => {
+      // Move the star downwards
+      s.pos.y += s.speed * stars.speedFactor;
+      // Bring the star back to top once it's past the bottom of the screen
+      if (s.pos.y > G.HEIGHT) s.pos.y = 0;
+
+      // Choose a color to draw
+      color("light_black");
+      // Draw the star as a square of size 1
+      box(s.pos, 2);
+  });
+  
+  // Update for meteorite
+  meteorite.forEach((m) => {
+    m.pos.y += 2;
+    
+    // meteorite reset
+    if (m.pos.y > G.HEIGHT) {
+      m.pos.y = 0;
+      // randomize meteorite pos
+      m.pos.x = rnd(G.WIDTH * 0.1, G.WIDTH * 0.9)
+    }
+    
+    color("red");
+    box(m.pos, 4)
+  });
+  
+  // Update for player
   color("cyan");
   box(player.pos, 10);
   
@@ -172,7 +188,7 @@ function update() {
   // otherwise restore variables
   if(input.isPressed) {
     player.speed = 4;
-    stars.speedFactor = 2.5;
+    stars.speedFactor = 4;
   } else {
     player.speed = G.DEFAULTPSPEED
     stars.speedFactor = 1;
