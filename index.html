@@ -35,8 +35,8 @@ const G = {
   DEFAULTPSPEED: 1,
   STAR_SPEED_MIN: 0.5,
 	STAR_SPEED_MAX: 1.5,
-  METE_SPEED_MIN: 2,
-  METE_SPEED_MAX: 2.5
+  METE_SPEED_MIN: 2.5,
+  METE_SPEED_MAX: 3.5
 };
 
 options = {
@@ -140,7 +140,7 @@ function update() {
     };
     
     // ---- Meteorite ----
-    meteorite = times(3, () => {
+    meteorite = times(4, () => {
       // define meteorite position
       const posX = rnd(G.WIDTH * 0.1, G.WIDTH * 0.9)
       const posY = rnd(0, G.HEIGHT)
@@ -169,6 +169,7 @@ function update() {
     //variable init for player
     player.speed = G.DEFAULTPSPEED;
     player.isMovingRight = true;
+    player.isPoweredUp = false;
     
 	}
   
@@ -211,13 +212,17 @@ function update() {
       m.pos.x = rnd(G.WIDTH * 0.1, G.WIDTH * 0.9)
       addScore(10 * m.speed);
       play("coin");
+      m.rnd = Math.floor((Math.random() * 7))
+      //console.log("rnd:" + m.rnd)
     }
     
-    color("red")
-    box(m.pos, 6)
-    
-    // GAME OVER
-    //console.log(JSON.stringify(box(m.pos, 6).isColliding.rect.cyan))
+    if(m.rnd == 0) {
+      color("yellow")
+      box(m.pos, 10)
+    } else {
+      color("red")
+      box(m.pos, 6)
+    }
   });
   
   // Update for laser
@@ -268,11 +273,26 @@ function update() {
   }
   
   
-  console.log(laser.thick)
+  //console.log(laser.thick)
   // Update for player
   color("cyan");
   box(player.pos, 15);
   
+  if(box(player.pos, 15).isColliding.rect.yellow && !player.isPoweredUp) {
+    player.isPoweredUp = true;
+  }
+  
+  if(player.isPoweredUp && !box(player.pos, 15).isColliding.rect.yellow) {
+    play("powerUp")
+    
+    if(player.isMovingRight) {
+      player.isMovingRight = false;
+    } else {
+      player.isMovingRight = true;
+    }
+  
+    player.isPoweredUp = false;
+  }
   // movement code
   if(player.isMovingRight) {
     player.pos.x += player.speed;
@@ -305,6 +325,7 @@ function update() {
     laser.posX = player.pos.x;
     laser.isInit = true;
   }
+  
 }
 
 // comment test
