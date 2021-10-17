@@ -42,7 +42,7 @@ const G = {
 options = {
   viewSize: {x: G.WIDTH, y: G.HEIGHT},
   theme: "pixel",
-  seed: 17,
+  seed: 10,
   isPlayingBgm: true
 };
 
@@ -83,7 +83,9 @@ let player;
 /**
  * @type { Meteorite [] }
  */
- let meteorite;
+ let debris;
+ 
+ let laser;
  
  
 
@@ -148,10 +150,21 @@ function update() {
         }
     });
     
+    // ---- laser ----
+    laser = {
+      posX : G.WIDTH / 2,
+      thick : 0
+    };
+    
     
     // init stars variable
     // star speed = random speed * factor
     stars.speedFactor = 1;
+    
+    // variable init for laser
+    laser.isReady = false;
+    laser.isInit = false;
+    laser.isFired = false;
     
     //variable init for player
     player.speed = G.DEFAULTPSPEED;
@@ -207,6 +220,55 @@ function update() {
     //console.log(JSON.stringify(box(m.pos, 6).isColliding.rect.cyan))
   });
   
+  // Update for laser
+  
+  
+  if(laser.thick < 5 && laser.isInit) {
+    laser.thick += 0.03
+    color("green");
+    line(laser.posX, 0, laser.posX, G.HEIGHT, laser.thick)
+  } else if (!laser.isReady && laser.isInit && !laser.isFired && laser.thick >= 5 && laser.thick < 6 ) {
+    laser.isReady = true;
+  }
+  
+  if(laser.isReady) {
+    if(laser.thick <= 20) {
+      laser.thick += 0.5
+    } else {
+      laser.thick = 15
+    }
+    color("red");
+    play(laser);
+    line(laser.posX, 0, laser.posX, G.HEIGHT, laser.thick)
+    if(laser.thick >= 20) {
+      laser.isFired = true
+    }
+  }
+  
+  if(laser.isFired) {
+    laser.isReady = false;
+    
+    if(laser.thick <= 19) {
+      laser.thick -= 0.5
+      color("green");
+    } else {
+      laser.thick -= 0.03
+      color("red");
+    }
+    
+    if(laser.thick <= 2) {
+      laser.isReady = false;
+      laser.isInit = false;
+      laser.isFired = false;
+      play("coin");
+      addScore(100);
+    }
+    
+    line(laser.posX, 0, laser.posX, G.HEIGHT, laser.thick)
+  }
+  
+  
+  console.log(laser.thick)
   // Update for player
   color("cyan");
   box(player.pos, 15);
@@ -237,6 +299,11 @@ function update() {
   } else {
     player.speed = G.DEFAULTPSPEED
     stars.speedFactor = 1;
+  }
+  
+  if(input.isJustPressed && !laser.isInit) {
+    laser.posX = player.pos.x;
+    laser.isInit = true;
   }
 }
 
