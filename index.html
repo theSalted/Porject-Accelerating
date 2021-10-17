@@ -226,7 +226,7 @@ function update() {
   });
   
   // Update for laser
-  
+  // MESSY AS HELLL!
   
   if(laser.thick < 5 && laser.isInit) {
     laser.thick += 0.03
@@ -280,6 +280,7 @@ function update() {
   
   if(box(player.pos, 15).isColliding.rect.yellow && !player.isPoweredUp) {
     player.isPoweredUp = true;
+    addScore(200);
   }
   
   if(player.isPoweredUp && !box(player.pos, 15).isColliding.rect.yellow) {
