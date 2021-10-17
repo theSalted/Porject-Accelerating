@@ -20,17 +20,75 @@
     <script src="https://abagames.github.io/crisp-game-lib/bundle.js"></script>
 
 <script>
-title = "";
+title = "Project Accelerating";
 
 description = `
 `;
 
 characters = [];
 
-options = {};
+const G = {
+  // screen size
+  WIDTH: 300,
+  HEIGHT: 300,
+  
+  // default player speed 
+  DEFAULTPSPEED: 1
+};
+
+options = {
+  viewSize: {x: G.WIDTH, y: G.HEIGHT}
+};
+
+// Initi Player
+
+/**
+ * @typedef {{
+ * pos: Vector,
+ * }} Player
+ */
+
+/**
+ * @type { Player }
+ */
+let player;
+
+
 
 function update() {
+  // initializing function
   if (!ticks) {
+    player = {
+      pos: vec(G.WIDTH * 0.5, G.HEIGHT * 0.8)
+    };
+    
+    //variable init for player
+    player.speed = G.DEFAULTPSPEED;
+    player.isMovingRight = true;
+  }
+  
+  // player activation
+  color("cyan");
+  box(player.pos, 10);
+  
+  // movement code
+  if(player.isMovingRight) {
+    player.pos.x += player.speed;
+  } else {
+    player.pos.x -= player.speed;
+  }
+  
+  // when player hit boundaries make it go reverse
+  if(player.pos.x >= G.WIDTH * 0.9) {
+    player.isMovingRight = false;
+  } else if(player.pos.x <= G.WIDTH * 0.1){
+    player.isMovingRight = true;
+  }
+  
+  if(input.isPressed) {
+    player.speed = 5;
+  } else {
+    player.speed = G.DEFAULTPSPEED
   }
 }
 
