@@ -151,10 +151,11 @@ function update() {
     // Choose a color to draw
     color("light_black");
     // Draw the star as a square of size 1
+    const avg = (G.STAR_SPEED_MAX + G.STAR_SPEED_MIN) / 2
     const i = (G.STAR_SPEED_MAX - G.STAR_SPEED_MIN) / 3
-    if(s.speed < (0.77777)) {
+    if(s.speed < (avg - i)) {
       box(s.pos, 1);
-    } else if (s.speed > (1.3333)) {
+    } else if (s.speed > (avg + i)) {
       box(s.pos, 3);
     } else {
       box(s.pos, 2);
