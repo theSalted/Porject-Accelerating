@@ -41,7 +41,9 @@ const G = {
 
 options = {
   viewSize: {x: G.WIDTH, y: G.HEIGHT},
-  theme: "pixel"
+  theme: "pixel",
+  seed: 17,
+  isPlayingBgm: true
 };
 
 // Initi Player
@@ -96,17 +98,37 @@ function update() {
         // returned as output of the times() function.
         
     // ---- STARS ----
-		stars = times(300, () => {
+		stars = times(500, () => {
             // Random number generator function
             // rnd( min, max )
             const posX = rnd(0, G.WIDTH);
             const posY = rnd(0, G.HEIGHT);
+            
+            const avg = (G.STAR_SPEED_MAX + G.STAR_SPEED_MIN) / 2
+            const i = (G.STAR_SPEED_MAX - G.STAR_SPEED_MIN) / 3
+            
+            var starTierRnd = Math.floor((Math.random() * 50));
+            var sSpeed = 10;
+            
+            if(starTierRnd == 0 || starTierRnd == 1) {
+              sSpeed = rnd(avg + i, G.STAR_SPEED_MAX)
+              //console.log("one")
+              
+            } else if (starTierRnd >= 2 && starTierRnd < 10) {
+              sSpeed = rnd(avg - i, avg + i)
+              //console.log("two")
+            } else {
+              sSpeed = rnd(G.STAR_SPEED_MIN, avg - i)
+              //console.log("three")
+            }
+            
+            
             // An object of type Star with appropriate properties
               return {
                   // Creates a Vector
                   pos: vec(posX, posY),
                   // More RNG
-                  speed: rnd(G.STAR_SPEED_MIN, G.STAR_SPEED_MAX)
+                  speed: sSpeed
               };
     });
     
@@ -153,6 +175,7 @@ function update() {
     // Draw the star as a square of size 1
     const avg = (G.STAR_SPEED_MAX + G.STAR_SPEED_MIN) / 2
     const i = (G.STAR_SPEED_MAX - G.STAR_SPEED_MIN) / 3
+    //console.log(s.speed);
     if(s.speed < (avg - i)) {
       box(s.pos, 1);
     } else if (s.speed > (avg + i)) {
@@ -174,6 +197,7 @@ function update() {
       // randomize meteorite pos
       m.pos.x = rnd(G.WIDTH * 0.1, G.WIDTH * 0.9)
       addScore(10 * m.speed);
+      play("coin");
     }
     
     color("red")
